@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f5eedb">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="PacerIQ Coach">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="description" content="iPhone-first 智慧跑步教練引擎，依跑量、可跑天數、睡眠、傷痛、目標賽事、心率與補給需求即時計算訓練建議。">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <title>PacerIQ Coach 2｜iPhone 跑步決策台</title>
+  <link rel="stylesheet" href="./assets/css/app.css">
+</head>
+<body data-alert="green">
+  <a class="skip-link" href="#main">跳到主要內容</a>
+
+  <header class="topbar" aria-label="主要導覽">
+    <div class="topbar__inner">
+      <a class="brand" href="#main" aria-label="PacerIQ Coach 首頁">
+        <span class="brand__mark" aria-hidden="true">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+            <path d="M4 17c4.5-9 8.5 6 16-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M7 7h.01M17 17h.01" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>
+          <span class="brand__name">PacerIQ Coach</span>
+          <span class="brand__meta">Evidence-guided running engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar__nav" aria-label="頁面區塊">
+        <a href="#coach">教練引擎</a>
+        <a href="#settings">參數</a>
+        <a href="#weekly">週課表</a>
+        <a href="#fuel">補給與心率</a>
+        <a href="#journal">日誌</a><a href="#evidence">研究來源</a>
+      </nav>
+
+      <button class="topbar__action" id="syncButton" type="button">儲存到本機</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <noscript><p class="notice">請啟用 JavaScript 才能計算課表。下方內容為操作介面，不是已產生的個人訓練建議。</p></noscript>
+    <div class="band__inner app-notices">
+      <p class="notice" id="profileNotice">示範參數：請先調整為自己的近況。適用一般成年跑者；不替代診斷、復健或個人教練評估。</p>
+      <p class="notice" id="connectionState" role="status">正在檢查離線功能…</p>
+      <button class="button-secondary" id="updateButton" type="button" hidden>儲存並套用新版本</button>
+    </div>
+    <section class="band cockpit" id="coach" aria-labelledby="coach-title">
+      <div class="band__inner workspace">
+        <section class="surface" aria-labelledby="coach-title">
+          <div class="surface__head">
+            <div>
+              <p class="section-kicker">Adaptive Coach Engine</p>
+              <h1 id="coach-title">跑步決策台</h1>
+              <p class="copy">從你的跑量與恢復開始，安排下一個可持續的星期。每個建議都能查看理由與研究來源。</p>
+            </div>
+            <div class="coach-status">
+              <span class="coach-status__pill" id="statusPill">—</span>
+              <p class="copy" id="statusCopy">—</p>
+            </div>
+          </div>
+
+          <div class="metric-strip" aria-label="核心教練數據">
+            <article class="metric">
+              <p class="metric__label">恢復參考</p>
+              <p class="metric__value"><span id="readinessMetric">—</span></p>
+              <p class="metric__note" id="readinessNote">—</p>
+            </article>
+            <article class="metric">
+              <p class="metric__label">下週跑量</p>
+              <p class="metric__value"><span id="weeklyMetric">—</span>K</p>
+              <p class="metric__note" id="progressionNote">—</p>
+            </article>
+            <article class="metric">
+              <p class="metric__label">低強度時間估計</p>
+              <p class="metric__value"><span id="lowMetric">—</span>%</p>
+              <p class="metric__note" id="intensityNote">—</p>
+            </article>
+            <article class="metric">
+              <p class="metric__label">本週最長跑</p>
+              <p class="metric__value"><span id="longMetric">—</span>K</p>
+              <p class="metric__note" id="longNote">—</p>
+            </article>
+          </div>
+
+          <div class="decision-grid">
+            <article class="prescription" aria-labelledby="today-title">
+              <div class="workout-title">
+                <strong id="today-title">本週課程預覽</strong>
+                <span id="sessionType">—</span>
+              </div>
+              <p class="coach-output" id="coachOutput">—</p>
+              <label class="field__label" for="sessionSelect">選擇預覽的訓練日</label>
+              <select id="sessionSelect"></select>
+              <div class="block-list" id="blockList"></div>
+              <div class="timer-panel" aria-labelledby="timerTitle">
+                <h3 id="timerTitle">前景課程計時</h3>
+                <p id="timerPhase">選好課程後開始</p>
+                <output id="timerClock" class="timer-clock" aria-label="本段剩餘時間">00:00</output>
+                <div class="actions"><button type="button" class="button" id="timerStart">開始</button><button type="button" class="button-secondary" id="timerReset">重設</button></div>
+                <label class="check-line"><input type="checkbox" id="wakeToggle">計時時保持螢幕亮起</label>
+                <p class="field__hint" id="timerStatus" role="status">切換 App 或鎖屏會暫停；回來後由你繼續，不提供背景提醒。</p>
+              </div>
+            </article>
+
+            <aside class="readiness-panel" aria-labelledby="readiness-title">
+              <div class="gauge">
+                <h2 id="readiness-title">恢復與風險</h2>
+                <div class="gauge__ring" id="gaugeRing" style="--score: 0">
+                  <span class="gauge__value" id="gaugeValue">—</span>
+                </div>
+                <p class="gauge__caption" id="gaugeCaption">—</p>
+              </div>
+              <div class="micro-map" aria-label="路線風險示意圖">
+                <svg viewBox="0 0 520 220" preserveAspectRatio="none" role="img" aria-label="跑步路線線稿">
+                  <path class="water" d="M0 160C76 143 118 90 193 112c89 27 93 82 186 58 51-13 72-50 141-42v92H0z"/>
+                  <path class="grid" d="M0 42h520M0 86h520M0 130h520M0 174h520M64 0v220M128 0v220M192 0v220M256 0v220M320 0v220M384 0v220M448 0v220"/>
+                  <path class="route" id="routeLine" d="M38 158C94 116 146 137 198 104c63-40 111 18 162 4 44-12 75-55 123-26"/>
+                  <circle cx="38" cy="158" r="6" fill="currentColor"/>
+                  <circle cx="483" cy="82" r="6" fill="currentColor"/>
+                </svg>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <aside class="control-rail" id="settings" aria-labelledby="settings-title">
+          <div>
+            <p class="section-kicker">Personal Controls</p>
+            <h2 id="settings-title">自訂教練參數</h2>
+            <p class="copy">調整後立即重算並嘗試自動儲存。本機資料不會上傳或跨裝置同步，請定期備份。</p>
+          </div>
+
+          <div class="form-grid">
+            <fieldset class="safety-checks"><legend>出門前先確認</legend>
+              <label class="check-line"><input id="emergencyToggle" type="checkbox">胸痛、昏厥或異常呼吸困難</label>
+              <label class="check-line"><input id="illnessToggle" type="checkbox">發燒或全身性不適</label>
+              <label class="check-line"><input id="gaitPainToggle" type="checkbox">局部痛加劇、無法承重或步態改變</label>
+              <p class="field__hint">有警訊就停止運動；系統不安排替代訓練或復健。</p>
+            </fieldset>
+            <div class="field">
+              <label for="goalSelect">目標</label>
+              <select id="goalSelect">
+                <option value="base">建立跑步習慣</option>
+                <option value="5k">5K 速度</option>
+                <option value="10k">10K 成績</option>
+                <option value="half" selected>半馬備賽</option>
+                <option value="marathon">全馬備賽</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <span class="field__label" id="experienceLabel">跑齡／承載能力</span>
+              <div class="segmented segmented--four" role="group" aria-labelledby="experienceLabel">
+                <button type="button" data-experience="new" aria-pressed="false">新手</button>
+                <button type="button" data-experience="returning" aria-pressed="false">回鍋</button>
+                <button type="button" data-experience="steady" aria-pressed="true">穩定</button>
+                <button type="button" data-experience="advanced" aria-pressed="false">進階</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <span class="field__label" id="modelLabel">強度模型</span>
+              <div class="segmented" role="group" aria-labelledby="modelLabel">
+                <button type="button" data-model="guarded" aria-pressed="false">保守累積</button>
+                <button type="button" data-model="polarized" aria-pressed="true">低強度優先</button>
+                <button type="button" data-model="pyramidal" aria-pressed="false">金字塔</button>
+                <button type="button" data-model="race" aria-pressed="false">賽前維持</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="daysRange">每週可跑天數</label>
+                <output id="daysValue">4 天</output>
+              </div>
+              <input id="daysRange" type="range" min="2" max="6" step="1" value="4">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="currentKmRange">近 4 週平均週量</label>
+                <output id="currentKmValue">28 km</output>
+              </div>
+              <input id="currentKmRange" type="range" min="0" max="90" step="0.1" value="28">
+              <span class="field__hint">引擎會先保護你已能承受的跑量，不會為了賽事硬跳。</span>
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="longRunRange">近 30 天最長跑</label>
+                <output id="longRunValue">11 km</output>
+              </div>
+              <input id="longRunRange" type="range" min="0" max="35" step="0.1" value="11">
+            </div>
+
+            <label class="check-line"><input id="known5kToggle" type="checkbox">我有近期 5K 測驗／比賽成績</label>
+            <div class="field">
+              <div class="field__row">
+                <label for="fiveKRange">近期 5K 成績（分鐘）</label>
+                <output id="fiveKValue">28:00</output>
+              </div>
+              <input id="fiveKRange" type="range" min="16" max="60" step="0.5" value="28">
+              <span class="field__hint">僅在有近期 5K 測驗／比賽成績時啟用配速估算；不是用輕鬆跑成績預測比賽配速。</span>
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="ageRange">年齡</label>
+                <output id="ageValue">36</output>
+              </div>
+              <input id="ageRange" type="range" min="18" max="85" step="1" value="36">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="weeksRange">距離目標週數</label>
+                <output id="weeksValue">10 週</output>
+              </div>
+              <input id="weeksRange" type="range" min="1" max="24" step="1" value="10">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="sleepRange">昨晚睡眠</label>
+                <output id="sleepValue">7.0 h</output>
+              </div>
+              <input id="sleepRange" type="range" min="3" max="10" step="0.5" value="7">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="sorenessRange">肌肉痠痛</label>
+                <output id="sorenessValue">3 / 10</output>
+              </div>
+              <input id="sorenessRange" type="range" min="0" max="10" step="1" value="3">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="stressRange">生活壓力</label>
+                <output id="stressValue">3 / 10</output>
+              </div>
+              <input id="stressRange" type="range" min="0" max="10" step="1" value="3">
+            </div>
+
+            <div class="field">
+              <div class="field__row">
+                <label for="painRange">跑步疼痛</label>
+                <output id="painValue">1 / 10</output>
+              </div>
+              <input id="painRange" type="range" min="0" max="10" step="1" value="1">
+              <span class="field__hint">疼痛 ≥4 分或步態改變會暫停跑步與肌力；任何程度惡化都應停止。</span>
+            </div>
+
+            <div class="field">
+              <label for="routeSelect">今天路況</label>
+              <select id="routeSelect">
+                <option value="river">平坦河岸：紅燈少</option>
+                <option value="city">城市道路：停等多</option>
+                <option value="trail">公園坡路：肌耐力</option>
+                <option value="treadmill">跑步機：穩定控速</option>
+              </select>
+            </div>
+
+            <label class="toggle" for="heatToggle">
+              <span>
+                <strong>熱／濕度偏高</strong><br>
+                <span class="field__hint">改用跑感，取消自動品質課並保守降載。</span>
+              </span>
+              <input id="heatToggle" type="checkbox">
+              <span class="toggle__track" aria-hidden="true"></span>
+            </label>
+
+            <label class="toggle" for="nightToggle">
+              <span>
+                <strong>夜跑安全模式</strong><br>
+                <span class="field__hint">長跑會加入照明、返程與補給提醒。</span>
+              </span>
+              <input id="nightToggle" type="checkbox" checked>
+              <span class="toggle__track" aria-hidden="true"></span>
+            </label>
+
+            <details class="advanced-settings"><summary>心率校準（選填）</summary>
+              <label for="measuredHrInput">專業測得的最大心率（bpm）</label>
+              <input id="measuredHrInput" type="number" inputmode="numeric" min="60" max="230" step="1" placeholder="留白使用年齡估式">
+              <label class="check-line"><input id="hrAffectedToggle" type="checkbox">藥物或健康狀況影響心率</label>
+              <p class="field__hint">不建議為取得數字自行做最大強度測試。勾選後僅顯示談話測試與跑感。</p>
+            </details>
+            <div class="actions">
+              <button class="button" id="rebuildButton" type="button">重算課表</button>
+              <button class="button-secondary" id="saveButton" type="button">儲存設定</button>
+            </div>
+
+            <div class="state" id="saveState" role="status" aria-live="polite">目前使用預設教練參數。</div>
+            <div class="state state--error" id="riskState" role="status" aria-live="polite">疼痛或疲勞偏高：今天不建議硬跑品質課。</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="band" id="weekly" aria-labelledby="weekly-title">
+      <div class="band__inner">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">7-day Planner</p>
+            <h2 id="weekly-title">可重算週課表</h2>
+          </div>
+          <p class="copy">總量以 0.1 km 精度分配，每一天都檢查單次距離。新手、回鍋或恢復不足時不安排品質課。</p>
+        </div>
+        <p class="notice" id="weekSummary"></p>
+        <div class="week-board" id="weekBoard" tabindex="0" role="region" aria-label="可橫向捲動的七日課表"></div>
+        <div class="export-row"><label for="weekStart">匯出起日（週一）</label><input id="weekStart" type="date"><button type="button" class="button-secondary" id="calendarButton">匯出行事曆 .ics</button><button type="button" class="button-secondary" id="sharePlanButton">分享課表文字</button></div>
+        <p class="field__hint" id="calendarStatus" role="status">行事曆為全天事件，使用裝置當地日期；每次訓練前仍須重新評估身體狀態。</p>
+      </div>
+    </section>
+
+    <section class="band" id="fuel" aria-labelledby="fuel-title">
+      <div class="band__inner intel-grid">
+        <article class="wide-panel" aria-labelledby="fuel-title">
+          <p class="section-kicker">Fuel / Hydration / REDs</p>
+          <h2 id="fuel-title">補給與恢復判讀</h2>
+          <p class="copy" id="fuelSummary">—</p>
+          <div class="fuel-list" id="fuelList"></div>
+          <details><summary>估算個人汗率</summary>
+            <form id="sweatForm" class="compact-grid">
+              <label>跑前體重 kg<input id="weightBefore" type="number" min="25" max="200" step="0.1" inputmode="decimal" required></label>
+              <label>跑後體重 kg<input id="weightAfter" type="number" min="25" max="200" step="0.1" inputmode="decimal" required></label>
+              <label>飲水量 mL<input id="waterDrunk" type="number" min="0" max="5000" step="10" inputmode="numeric" required></label>
+              <label>排尿量 mL<input id="urine" type="number" min="0" max="3000" step="10" inputmode="numeric" value="0" required></label>
+              <label>運動分鐘<input id="sweatMinutes" type="number" min="10" max="600" inputmode="numeric" required></label>
+              <button class="button-secondary" type="submit">計算</button>
+            </form><p id="sweatResult" role="status">用相似衣著與量測條件；估值不是必須喝到的量，也不自動儲存體重。</p>
+          </details>
+        </article>
+
+        <article class="wide-panel" aria-labelledby="zone-title">
+          <p class="section-kicker">Heart Rate / RPE</p>
+          <h2 id="zone-title">心率與跑感區間</h2>
+          <p class="copy" id="zoneSummary">—</p>
+          <div class="zone-table" id="zoneTable"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="band" id="rules" aria-labelledby="rules-title">
+      <div class="band__inner intel-grid">
+        <article class="wide-panel" aria-labelledby="load-chart-title">
+          <p class="section-kicker">Load Distribution</p>
+          <h2 id="load-chart-title">負荷分配</h2>
+          <p class="copy" id="loadSummary">—</p>
+          <div class="bar-chart" aria-label="負荷分配圖">
+            <span class="bar" id="lowBar" style="--height: 80%">低強度</span>
+            <span class="bar" id="moderateBar" style="--height: 8%">中強度</span>
+            <span class="bar" id="hardBar" style="--height: 12%">高強度</span>
+            
+          </div>
+        </article>
+
+        <article class="wide-panel" aria-labelledby="rules-title">
+          <p class="section-kicker">Coach Guardrails</p>
+          <h2 id="rules-title">透明規則</h2>
+          <p class="copy">教練引擎不只輸出結果，也顯示為什麼這樣排。</p>
+          <div class="rules-list" id="rulesList"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="band" id="journal" aria-labelledby="journalTitle">
+      <div class="band__inner intel-grid">
+        <article class="wide-panel"><p class="section-kicker">Training Journal</p><h2 id="journalTitle">記下真實跑感</h2>
+          <p class="copy">結束後回想整堂訓練的用力程度。session-RPE 負荷＝分鐘 × 0–10 跑感，單位 AU；不是傷害機率。</p>
+          <form id="logForm" class="compact-grid">
+            <label>日期<input id="logDate" type="date" required></label>
+            <label>距離 km<input id="logKm" type="number" min="0" max="200" step="0.1" inputmode="decimal" required></label>
+            <label>總分鐘<input id="logMinutes" type="number" min="1" max="1440" step="1" inputmode="numeric" required></label>
+            <label>整堂跑感 RPE 0–10<input id="logRpe" type="number" min="0" max="10" step="0.5" inputmode="decimal" required></label>
+            <label class="span-all">備註（選填）<textarea id="logNote" maxlength="240" rows="2" placeholder="路況、補給、隔天感受…"></textarea></label>
+            <button class="button" type="submit">新增紀錄</button>
+          </form><p id="logStatus" role="status"></p>
+        </article>
+        <article class="wide-panel"><p class="section-kicker">Your Recorded Load</p><h2>近七天紀錄</h2>
+          <p id="logSummary"></p><div id="logList"></div><button id="moreLogs" class="button-secondary" type="button" hidden>顯示更多紀錄</button>
+          <p class="field__hint">只統計已輸入的紀錄，不自動推斷漏記日，也不自動改動跑量基準。</p>
+        </article>
+      </div>
+    </section>
+    <section class="band" id="evidence" aria-labelledby="evidence-title">
+      <div class="band__inner">
+        <div class="section-head"><div><p class="section-kicker">Research Library · 2026.10</p><h2 id="evidence-title">讓每個建議有出處</h2></div><p class="copy">26 份運動／健康文獻與指引，加上 4 份 Apple／WebKit 文件。區分研究結果、限制與產品轉譯；作者與機構未背書本系統。</p></div>
+        <div class="library-controls"><label for="sourceSearch">搜尋專家、主題或關鍵字</label><input id="sourceSearch" type="search" placeholder="例如 Seiler、碳水、iPhone" autocomplete="off"><label for="sourceCategory">分類</label><select id="sourceCategory"><option value="all">全部主題</option></select></div>
+        <p id="sourceCount" role="status"></p><div class="source-grid" id="sourceList"></div>
+      </div>
+    </section>
+    <section class="band" id="device" aria-labelledby="deviceTitle"><div class="band__inner intel-grid">
+      <article class="wide-panel"><p class="section-kicker">Made for iPhone</p><h2 id="deviceTitle">隨時帶著走</h2>
+        <ol class="install-steps"><li>以 iPhone 的 Safari 開啟 HTTPS 網址。</li><li>點分享 →「加入主畫面」；部分版本可選「以網頁 App 打開」。</li><li>先在線上開啟一次，確認上方顯示離線檔案已備妥。</li></ol>
+        <p id="installState" class="copy"></p><p class="field__hint">Web App 沒有讀取 Apple 健康／HealthKit、背景 GPS 或鎖屏提醒。外部研究連結需要網路。</p>
+        <button id="persistButton" class="button-secondary" type="button">請求保留本機資料</button><p id="persistStatus" role="status"></p>
+      </article>
+      <article class="wide-panel"><p class="section-kicker">Your Data, Your Device</p><h2>備份與還原</h2><p class="copy">設定與日誌留在此瀏覽器；清除網站資料或移除 App 可能使資料遺失。備份檔含個人訓練資料，請自行妥善保存。</p>
+        <div class="actions"><button id="backupButton" class="button" type="button">匯出 JSON 備份</button><button id="restoreButton" class="button-secondary" type="button">匯入備份</button></div>
+        <input type="file" id="restoreFile" accept="application/json,.json" hidden><p id="backupStatus" role="status"></p>
+        <p class="field__hint">匯入前會檢查格式、日期與數值，並讓你確認替換範圍。</p>
+      </article>
+    </div></section>
+  </main>
+
+  <footer class="band foot-band">
+    <div class="band__inner">
+      <strong>PacerIQ Coach Engine</strong>
+      <p>PacerIQ 2.0 · iPhone / Safari 優先的靜態 Web App。所有運算在本機完成；示範參數、估算課表與健康資訊不替代專業個別評估。</p>
+      <p><a href="#coach">回到教練引擎</a></p>
+    </div>
+  </footer>
+
+  <div class="mobile-dock" role="toolbar" aria-label="iPhone 快速操作">
+    <span class="mobile-dock__status" id="dockStatus">—</span>
+    <button class="mobile-dock__secondary" id="mobileSaveButton" type="button">儲存</button>
+    <button class="mobile-dock__primary" id="mobileRebuildButton" type="button">重算</button>
+  </div>
+
+  <script defer src="./assets/js/engine.js"></script>
+  <script defer src="./assets/js/evidence.js"></script>
+  <script defer src="./assets/js/storage.js"></script>
+  <script defer src="./assets/js/app.js"></script>
+</body>
+</html>

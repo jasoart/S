@@ -1,0 +1,37 @@
+/* Curated on 2026-10-30. Original summaries, not reproduced source text. */
+(function(root){
+  'use strict';
+  const entries=[
+    ['who','健康','WHO',2020,'官方指引','WHO guidelines on physical activity and sedentary behaviour','https://www.who.int/europe/publications/i/item/9789240014886','成人以規律活動與每週至少兩天肌力為健康方向。','健康建議不等於跑步里程處方；新手從可承受的活動開始。'],
+    ['talk','強度','CDC',2025,'官方指引','How to Measure Physical Activity Intensity','https://www.cdc.gov/physical-activity-basics/measuring/','談話測試可輔助判斷相對強度。','輕鬆跑以能完整說話與 RPE 2–4 自我校正；RPE 分級是本產品的簡化提示。'],
+    ['seiler','強度','Stephen Seiler',2010,'研究綜述','What is best practice for training intensity and duration distribution in endurance athletes?','https://pubmed.ncbi.nlm.nih.gov/20861519/','耐力選手常以低強度為訓練主體。','菁英觀察不能直接變成每位新手的 80/20 處方；次數與時間比例也不同。'],
+    ['seiler2006','強度','Stephen Seiler、Glenn Kjerland',2006,'觀察研究','Quantifying training intensity distribution in elite endurance athletes','https://pubmed.ncbi.nlm.nih.gov/16430681/','強度分布的計算方式會影響結果。','本系統顯示課表估算時間比例，不宣稱是生理閾值實測。'],
+    ['esteve','強度','Jonathan Esteve-Lanao、Stephen Seiler 等',2007,'介入研究','Impact of training intensity distribution on performance in endurance athletes','https://pubmed.ncbi.nlm.nih.gov/17685689/','增加低強度比重可作為耐力訓練的研究方向。','樣本與訓練背景有限；不把結果當作所有跑者的唯一最佳配方。'],
+    ['munoz','強度','Iker Muñoz、Stephen Seiler 等',2014,'隨機試驗','Does polarized training improve performance in recreational runners?','https://pubmed.ncbi.nlm.nih.gov/23752040/','兩組業餘跑者皆改善 10K 表現；主要組間差異未達統計顯著。','不宣稱極化模式必然較好；恢復不足時所有模型都取消品質課。'],
+    ['stoggl','強度','Thomas Stöggl、Billy Sperlich',2015,'研究綜述','The training intensity distribution among well-trained and elite endurance athletes','https://pmc.ncbi.nlm.nih.gov/articles/PMC4621419/','不同訓練階段可能採金字塔或極化分布。','模型按目標調整主段，不強迫湊足高強度百分比。'],
+    ['iocload','負荷','Torbjørn Soligard／IOC 專家小組',2016,'專家共識','How much is too much? Part 1: load in sport and risk of injury','https://pubmed.ncbi.nlm.nih.gov/27535989/','負荷監測需同時看訓練、恢復、心理與個人背景。','本系統分數僅為透明啟發式；不採用單一數字預測受傷。舊版 ACWR 建議有後續爭議。'],
+    ['monitor','負荷','國際訓練負荷監測專家小組',2017,'專家共識','Monitoring Athlete Training Loads: Consensus Statement','https://pubmed.ncbi.nlm.nih.gov/28463642/','內在負荷與外在負荷應一起記錄。','日誌保留距離、分鐘與主觀跑感；缺漏紀錄不視為完整訓練史。'],
+    ['acwr','負荷','Franco Impellizzeri、Aaron Coutts 等',2020,'方法學評析','Acute:Chronic Workload Ratio: Conceptual Issues and Fundamental Pitfalls','https://pubmed.ncbi.nlm.nih.gov/32502973/','ACWR 存在概念與統計問題。','不顯示 ACWR 安全區或個人受傷機率，只顯示已記錄的負荷。'],
+    ['spike','負荷','Jesper Frandsen、Rasmus Nielsen 等',2025,'前瞻世代研究','How much running is too much? Identifying high-risk running sessions in a 5200-person cohort study','https://pubmed.ncbi.nlm.nih.gov/40623829/','5,205 位跑者中，單次超過近 30 天最長距離 10% 與較高過度使用傷害率相關。','觀察關聯不是安全閾值。本產品以最多 5% 的單次增幅作保守設計，並非研究驗證的處方。'],
+    ['srpe','負荷','Carl Foster 等',2001,'方法研究','A new approach to monitoring exercise training','https://pubmed.ncbi.nlm.nih.gov/11708692/','可用整堂訓練的 RPE 與分鐘數追蹤主觀負荷。','日誌顯示 分鐘 × session-RPE 的任意單位 AU；不作醫療或受傷預測。'],
+    ['hr','強度','Hirofumi Tanaka、Kevin Monahan、Douglas Seals',2001,'統合分析＋驗證研究','Age-predicted maximal heart rate revisited','https://pubmed.ncbi.nlm.nih.gov/11153730/','健康成人的群體最大心率估式為 208 − 0.7 × 年齡。','個體誤差可能大；優先採專業測得的值。有影響心率的藥物／狀況時隱藏數字。'],
+    ['nutrition','補給','D. Travis Thomas、Kelly Erdman、Louise Burke／ACSM',2016,'聯合立場聲明','Nutrition and Athletic Performance','https://pubmed.ncbi.nlm.nih.gov/26920240/','飲食總量、時機與訓練需求需要協調。','營養提示用於演練與討論，不計算減重熱量，也不提供個人營養治療。'],
+    ['athletics','補給','Louise Burke、Trent Stellingwerff 等／World Athletics',2019,'專家共識','IAAF Consensus Statement 2019: Nutrition for Athletics','https://pubmed.ncbi.nlm.nih.gov/30952204/','田徑營養應配合項目、訓練階段與個體，以食物為基礎。','補給需先在訓練中演練；不自動推薦保健品或補充劑。'],
+    ['carbs','補給','Louise Burke、John Hawley、Asker Jeukendrup 等',2011,'研究綜述','Carbohydrates for training and competition','https://pubmed.ncbi.nlm.nih.gov/21660838/','運動持續時間與強度影響碳水需求，長時間活動需注意腸胃耐受。','依課表估計時間給 30–60 g/h 等演練範圍；超長時間的較高攝取量須逐步適應。'],
+    ['fluid','補給','Michael Sawka、Louise Burke 等／ACSM',2007,'立場聲明','Exercise and fluid replacement','https://pubmed.ncbi.nlm.nih.gov/17277604/','流汗量與環境差異使補水需求具有個人差異。','提供汗率估算，非強制飲水量；不固定要求所有人每小時喝同一體積。'],
+    ['sodium','補給','Tamara Hew-Butler、Mitchell Rosner 等',2015,'專家共識','Third International Exercise-Associated Hyponatremia Consensus','https://pubmed.ncbi.nlm.nih.gov/26102445/','過量飲水可能導致運動相關低血鈉。','補水避免超過損失，鈉不能抵銷過量飲水；有不適應停止並就醫。'],
+    ['heat','環境','Sébastien Racinais、Julien Périard 等',2015,'專家共識','Consensus Recommendations on Training and Competing in the Heat','https://pmc.ncbi.nlm.nih.gov/articles/PMC4473280/','熱適應、環境與補水會影響耐力表現及熱風險。','熱濕模式取消自動品質課，改用跑感；不套用固定每公里加幾秒的假精確補償。'],
+    ['reds','恢復','Margo Mountjoy、Kathryn Ackerman、Louise Burke 等／IOC',2023,'專家共識','IOC consensus statement on Relative Energy Deficiency in Sport (REDs)','https://bjsm.bmj.com/content/57/17/1073','低能量可影響不同性別運動員的健康與表現，需由專業團隊評估。','睡眠、壓力或疼痛不能排除／診斷 REDs。持續疲勞、月經改變或反覆骨傷應求助專業。'],
+    ['sleep','恢復','Neil Walsh、Shona Halson、Charli Sargent 等',2021,'專家共識','Sleep and the athlete: narrative review and 2021 expert consensus recommendations','https://pubmed.ncbi.nlm.nih.gov/33144349/','運動員睡眠應考慮個人需求、時間安排與訓練情境。','短睡眠觸發保守降載是產品規則；單晚睡眠不能換算為經驗證的恢復分數。'],
+    ['strength','肌力','Richard Blagrove、Glyn Howatson、Philip Hayes',2018,'系統性回顧','Effects of Strength Training on the Physiological Determinants of Middle- and Long-Distance Running Performance','https://pubmed.ncbi.nlm.nih.gov/29249083/','適當肌力訓練可改善部分跑步經濟性與表現指標。','無痛且恢復良好才提示可選肌力；不保證防傷，也不安排疼痛復健。'],
+    ['taper','週期','Laurent Bosquet、Iñigo Mujika 等',2007,'統合分析','Effects of tapering on performance: a meta-analysis','https://pubmed.ncbi.nlm.nih.gov/17762369/','賽前減量可協助競技選手調整疲勞與表現。','本產品最後兩週先降低建議量；無完整訓練史，不能視為個人化比賽週期。'],
+    ['taper2023','週期','耐力減量訓練研究團隊',2023,'系統性回顧＋統合分析','Effects of tapering on performance in endurance athletes','https://pubmed.ncbi.nlm.nih.gov/37163550/','減量幅度、時間、強度與頻率共同影響表現。','不能為了倒數週數而補追長跑；介面顯示的 20%／40% 降量為保守產品設計。'],
+    ['beginner','健康','NHS',2025,'官方入門計畫','Couch to 5K running plan','https://www.nhs.uk/better-health/get-active/get-running-with-couch-to-5k/couch-to-5k-running-plan/','用循序跑走與休息日建立入門習慣。','零跑量時不硬排公里數；先參考跑走計畫建立可承受的基準。'],
+    ['urgent','健康','American Heart Association',2024,'官方健康資訊','Warning Signs of a Heart Attack','https://www.heart.org/health-topics/heart-attack/warning-signs-of-a-heart-attack','胸部不適與異常呼吸困難等症狀需要及時醫療協助。','警訊勾選立即停用訓練輸出；系統不能判斷症狀原因或嚴重程度。'],
+    ['ioshome','iPhone','Apple',null,'官方文件','Turn a website into an app in Safari on iPhone','https://support.apple.com/en-lamr/guide/iphone/iphea86e5236/ios','Safari 的分享選單可將網站加入主畫面。','按鈕名稱依 iOS 版本不同；本系統是 Web App，沒有直接讀取 HealthKit。'],
+    ['iossafe','iPhone','WebKit',2017,'官方工程文件','Designing Websites for iPhone X','https://webkit.org/blog/7929/designing-websites-for-iphone-x/','viewport-fit 與 safe-area-inset 可避開螢幕缺口及底部操作區。','介面保留安全區與可放大文字，並提供至少 44px 的主要操作。'],
+    ['iosstorage','iPhone','WebKit',2023,'官方工程文件','Updates to Storage Policy','https://webkit.org/blog/14403/updates-to-storage-policy/','瀏覽器儲存有配額與清理政策，持久儲存需檢測與申請。','資料儲存失敗明確提示，並提供 JSON 備份；不能承諾本機資料永久保留。'],
+    ['ioswake','iPhone','WebKit',2023,'官方工程文件','WebKit Features in Safari 16.4','https://webkit.org/blog/13966/webkit-features-in-safari-16-4/','Safari 16.4 加入 Screen Wake Lock API。','前景計時可要求保持亮屏；不支援、低電量或鎖屏時不保證可用，沒有背景通知承諾。']
+  ].map(([id,category,authors,year,type,title,url,takeaway,application])=>({id,category,authors,year,type,title,url,takeaway,application,reviewed:'2026-10-30'}));
+  if(typeof module==='object'&&module.exports)module.exports=entries;else root.PacerEvidence=entries;
+})(globalThis);
